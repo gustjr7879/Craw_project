@@ -44,7 +44,8 @@ if __name__ == '__main__':
         integrated_data = pd.read_csv('./integrated_data.csv')
         integrated_data = integrated_data.drop('Unnamed: 0',axis=1)
 
-
+    print(integrated_data)
+    exit()
 
     result_list = change_data(integrated_data['기술스택'])
 
