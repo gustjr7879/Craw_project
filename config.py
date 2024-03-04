@@ -6,6 +6,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--predata', default=1, type=int)
     parser.add_argument('--premodel', default=0, type=int)
+    parser.add_argument('--allpreprocess', default=0, type=int)
     parser.add_argument('--model_vec_size', default=16, type=int)
     parser.add_argument('--model_win_size', default=3, type=int)
     parser.add_argument('--model_neg_size', default=5, type=int)
