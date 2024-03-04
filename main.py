@@ -25,7 +25,6 @@ if __name__ == '__main__':
         #통합 데이터 제작
         concat_data = DataPreprocessing.data_concat(programmers,rallit,wanted)#.drop('Unnamed: 0',axis=1)
 
-        #기업 정보 크롤링
         names = concat_data['기업명']
         #잘못된 기업 이름 수정
         for i in range(len(names)):
