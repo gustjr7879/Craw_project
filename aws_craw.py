@@ -14,6 +14,8 @@ import konlpy
 class CModels():
     def __init__(self):
         pass
+    
+    #원티드 인사이트 크롤링
     def company_info(data):
         driver = webdriver.Chrome()
         driver.get('https://insight.wanted.co.kr/')
@@ -26,7 +28,7 @@ class CModels():
         money_list = []
         homepage_list = []
         worker_money_list = []
-        for i in company_names:
+        for i in company_names:  # 사이트에 등록된 기업명으로 검색
             if i == '피어테크(지닥)':
                 i = '피어테크'
             elif i == '아인잡(AINJOB)':
@@ -78,25 +80,26 @@ class CModels():
 
         return company_df
 
-
+    
+    #원티드 크롤링
     def wanted_craw():
         driver = webdriver.Chrome()
-        driver.get('https://www.wanted.co.kr/search?query=aws&tab=position')
-        time.sleep(5)
-        actions = driver.find_element(By.CSS_SELECTOR, 'body')
+        driver.get('https://www.wanted.co.kr/search?query=aws&tab=position') #AWS 직무 검색된 페이지로 이동
+        time.sleep(5) #혹시모를 네트워크 장애 대비
+        actions = driver.find_element(By.CSS_SELECTOR, 'body') # home, end 키 설정을 위함
         all_ = int(driver.find_element(By.XPATH,'//*[@id="search_tabpanel_position"]/div/div[1]/h2/span').text) #모든 공고 숫자
-        tcnt = len(driver.find_elements(By.CLASS_NAME,"JobCard_container__FqChn.JobCard_container--variant-card__znjV9"))
-        while tcnt < all_:
-            actions.send_keys(Keys.END)
-            tcnt = len(driver.find_elements(By.CLASS_NAME,"JobCard_container__FqChn.JobCard_container--variant-card__znjV9"))
-            time.sleep(2)
+        tcnt = len(driver.find_elements(By.CLASS_NAME,"JobCard_container__FqChn.JobCard_container--variant-card__znjV9")) #반응형이라서 표시된 공고 카운팅
+        while tcnt < all_: #표시된 공고가 전체 공고보다 작을 때 
+            actions.send_keys(Keys.END) #end를 계속 누름
+            tcnt = len(driver.find_elements(By.CLASS_NAME,"JobCard_container__FqChn.JobCard_container--variant-card__znjV9")) #count 다시 계산
+            time.sleep(2) 
             print(tcnt)
         time.sleep(1)
-        actions.send_keys(Keys.HOME)
+        actions.send_keys(Keys.HOME) #위로 올라감
         time.sleep(3)
         import pandas as pd
         wanted_df = pd.DataFrame(columns= ['기업명','주소','직급','기술스택','자격요건','우대사항','url','기업url'])
-
+        # 데이터 설정
         loca_list = []
         name_list = []
         must_list = []
@@ -104,29 +107,25 @@ class CModels():
         experience_list = []
         url_list = []
         for j in range(1,all_+1):
-            driver.find_element(By.XPATH,f'//*[@id="search_tabpanel_position"]/div/div[4]/div[{j}]/a/div[2]/strong').click()
+            driver.find_element(By.XPATH,f'//*[@id="search_tabpanel_position"]/div/div[4]/div[{j}]/a/div[2]/strong').click() # J번째 공고 클릭 
 
             time.sleep(3)
-            company_name = driver.find_element(By.XPATH,'//*[@id="__next"]/main/div[1]/div/section/header/div/div[1]/a').text
+            company_name = driver.find_element(By.XPATH,'//*[@id="__next"]/main/div[1]/div/section/header/div/div[1]/a').text #기업이름
             
-            #actions.send_keys(Keys.PAGE_DOWN)
-            #actions.send_keys(Keys.PAGE_DOWN)
-            name_list.append(company_name)
-            #wait = WebDriverWait(driver, 5)
-            #//*[@id="__next"]/main/div[1]/div/section/section/article[1]/div/button
-            #wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__next"]/main/div[1]/div/section/section/article[1]/div/button/span[2]'))).click()
+
+            name_list.append(company_name) 
             time.sleep(.5)
-            driver.find_element(By.XPATH,'//*[@id="__next"]/main/div[1]/div/section/section/article[1]/div/button').send_keys(Keys.ENTER)#.click()
-            experience = driver.find_element(By.XPATH, '//*[@id="__next"]/main/div[1]/div/section/header/div/div[1]/span[4]').text
+            driver.find_element(By.XPATH,'//*[@id="__next"]/main/div[1]/div/section/section/article[1]/div/button').send_keys(Keys.ENTER)#.click() #클릭 안되는 오류로 인해서 엔터로 상세 페이지
+            experience = driver.find_element(By.XPATH, '//*[@id="__next"]/main/div[1]/div/section/header/div/div[1]/span[4]').text #경력
             experience_list.append(experience)
-            url_list.append(driver.current_url)
+            url_list.append(driver.current_url) #해당 페이지 URL
             
-            actions.send_keys(Keys.PAGE_DOWN)
-            #actions.send_keys(Keys.PAGE_DOWN)
+            actions.send_keys(Keys.PAGE_DOWN) #내려가기
+            
             time.sleep(1)
             try:
                 location = driver.find_element(By.XPATH,'//*[@id="__next"]/main/div[1]/div/section/section/article[4]/div/div/span').text
-                loca_list.append(location)    
+                loca_list.append(location)    #위치
             except:
                 location = driver.find_element(By.XPATH,'//*[@id="__next"]/main/div[1]/div/section/section/article[5]/div/div/span').text
                 loca_list.append(location)         
@@ -137,13 +136,13 @@ class CModels():
                 
                 if i == 2:
                     must = re.sub('•','',driver.find_element(By.XPATH,f'//*[@id="__next"]/main/div[1]/div/section/section/article[1]/div/div[{i}]').text).split('\n')[1:]
-                    #must = DataPreprocessing(must).change_data()
-                elif i == 3:
+                    #자격요건
+                    elif i == 3:
                     prefer = re.sub('•','',driver.find_element(By.XPATH,f'//*[@id="__next"]/main/div[1]/div/section/section/article[1]/div/div[{i}]').text).split('\n')[1:]
-                    #prefer = DataPreprocessing(prefer).change_data()
+                    #우대사항
             must_list.append(must)
             prefer_list.append(prefer)
-            driver.back()
+            driver.back() #뒤로가기
         wanted_df['주소'] = loca_list #['기업명','주소','직급','기술스택','자격요건','우대사항','url','기업url']
         wanted_df['기업명'] = name_list
         wanted_df['직급'] = experience_list
@@ -153,23 +152,23 @@ class CModels():
         
         for i in range(len(wanted_df)):
             data = DataPreprocessing(must_list[i]).change_data()
-            #print(data)
+            #기술스택 추출하기 위해서 자격요건에서 영어 데이터만 사용
             wanted_df['기술스택'][i] = DataPreprocessing(data).only_eng()
         return wanted_df
     
 
-
+    # 프로그래머스 크롤링
     def prog_craw():
         page_no = 1
         programmers_url = f"https://career.programmers.co.kr/job?page={page_no}&tags=AWS%20Alexa&tags=AWS%20CloudFront&tags=AWS%20CloudWatch&tags=AWS%20DynamoDB&tags=AWS%20EC2&tags=AWS%20RDS&tags=AWS%20Redshift&tags=AWS%20S3&tags=AWS%20IAM&tags=AWS%20Lambda&tags=AWS%20Polly&tags=AWS%20ElastiCache&tags=AWS%20Pinpoint&tags=AWS%20ElasticBeanstalk&tags=AWS%20ECS&tags=AWS%20CodePipeline&tags=AWS%20Amplify&tags=AWS%20AppStream&tags=AWS%20AppSync&tags=AWS%20Artifact&tags=AWS%20Athena&tags=AWS%20Backup&tags=AWS%20Batch&tags=AWS%20Budgets&tags=AWS%20Chime&order=recent"
         option = webdriver.ChromeOptions()
-        option.add_argument('headless')
+        option.add_argument('headless')  # 창을 열지 않고 실행
 
         driver = webdriver.Chrome(options= option)
         driver.get(programmers_url)
         # jobs라는 변수에 aws 관련 모든 공고 갯수를 지정해줌. 자료형 int로 바꾸어주었음.
         jobs = int(re.sub('개의 포지션','',driver.find_element(By.XPATH,'//*[@id="list-positions-wrapper"]/div/div[1]/h6').text))
-
+        
         # 한 페이지에 표현되는 공고 건수 20개
         # 총 공고 건수에서 20을 나누어 max page를 컨트롤 하겠음
         max_page = jobs//20 + 1
@@ -177,8 +176,7 @@ class CModels():
 
         for page_no in range(1, max_page+1):
             programmers_url = f"https://career.programmers.co.kr/job?page={page_no}&tags=AWS%20Alexa&tags=AWS%20CloudFront&tags=AWS%20CloudWatch&tags=AWS%20DynamoDB&tags=AWS%20EC2&tags=AWS%20RDS&tags=AWS%20Redshift&tags=AWS%20S3&tags=AWS%20IAM&tags=AWS%20Lambda&tags=AWS%20Polly&tags=AWS%20ElastiCache&tags=AWS%20Pinpoint&tags=AWS%20ElasticBeanstalk&tags=AWS%20ECS&tags=AWS%20CodePipeline&tags=AWS%20Amplify&tags=AWS%20AppStream&tags=AWS%20AppSync&tags=AWS%20Artifact&tags=AWS%20Athena&tags=AWS%20Backup&tags=AWS%20Batch&tags=AWS%20Budgets&tags=AWS%20Chime&order=recent"
-            #print('현재 크롤링하는 페이지는:', page_no) # 어디서 오류나는지 찾기 위해
-            
+        
             driver = webdriver.Chrome(options= option)
             driver.get(programmers_url)
             time.sleep(3) # 타임슬립 안 걸어주면 로딩 다 안 된 상태라 오류남
@@ -187,8 +185,6 @@ class CModels():
             현재페이지공고 = len(driver.find_elements(By.XPATH,'//*[@id="list-positions-wrapper"]/ul/li'))
             
             for i in range(1, 현재페이지공고+1):
-                
-                #print(page_no,'번 페이지의',i,'번 기업 크롤링 중...') # 어디서 오류나는지 찾기 위해
                 
                 # 첫번째 공고부터 차례대로 클릭해서 크롤링하겠음
                 driver.find_element(By.XPATH,f'//*[@id="list-positions-wrapper"]/ul/li[{i}]').click()
@@ -199,10 +195,6 @@ class CModels():
                 time.sleep(2)
             
                 # 기업명
-                
-                #//*[@id="career-app-legacy"]/div/div[1]/div[1]/header/div/div[2]/h4/a origin
-                #//*[@id="career-app-legacy"]/div[1]/div[1]/div[1]/header/div/div[2]/h4/a
-                #//*[@id="career-app-legacy"]/div[1]/div[1]/div[1]/header/div/div[2]/h4/a
                 try:
                     기업명 = driver.find_element(By.XPATH,'//*[@id="career-app-legacy"]/div/div[1]/div[1]/header/div/div[2]/h4/a').text 
 
@@ -267,7 +259,8 @@ class CModels():
                 driver.switch_to.window(driver.window_handles[-1])
         return programmers_df
     
-    
+
+    # 랠릿 크롤링
     def rallit_craw():
         '''
         stext : 검색내용
@@ -367,7 +360,7 @@ class CModels():
                         driver.switch_to.window(driver.window_handles[-1])
                         driver.back()   # 뒤로가기
                         time.sleep(2)
-                        driver.switch_to.window(driver.window_handles[-1])   # 원래 처음 창으로 focus 이동  
+                        driver.switch_to.window(driver.window_handles[-1])   # 원래 처음 창으로 focus 이동
 
             res = pd.DataFrame([기업명, 주소, 직급, 기술스택, 자격요건, 우대사항, url, 기업url], 
                             index=['기업명', '주소', '직급', '기술스택', '자격요건', '우대사항', 'url', '기업url']).T
@@ -381,17 +374,17 @@ class DataPreprocessing():
     def __init__(self,data):
         self.data = data
 
-    def change_data(self):
+    def change_data(self):  # 리스트 형식으로 변경
         result_list = []
         for i in range(len(self.data)):
             result_list.append([item.strip(" '[]") for item in self.data[i].split(',')])
         return result_list
     
-    def only_eng(self):
+    def only_eng(self):  # 영어 데이터만 가져오기
         result_list = self.data
         for i in range(len(result_list)):
             for j in range(len(result_list[i])):
-                #print(result_list[i][j])
+                
                 result_list[i][j] = ' '.join(re.findall(r'[a-zA-Z]+', result_list[i][j]))
             result_list[i] = [x for x in result_list[i] if x != '']
         for i in result_list:
@@ -401,11 +394,11 @@ class DataPreprocessing():
         return result_list
     
     def data_concat(data1,data2,data3):
-        inte_data = pd.concat([pd.concat([data1,data2],axis=0),data3],axis=0)#.drop('Unnamed: 0',axis=1)
+        inte_data = pd.concat([pd.concat([data1,data2],axis=0),data3],axis=0)
         inte_data = inte_data.reset_index().drop('index',axis=1)
         return inte_data
     
-    def name_chk(data):
+    def name_chk(data):  # 사이트에 등록된 기업명으로 검색
         if data == '인프랩 (인프런)':
             data = '인프랩'
         elif data == '(주) 미스터카멜':
@@ -457,9 +450,10 @@ def all_preprocess(integrated_data):
     integrated_data['사원수'] = integrated_data['사원수'].apply(lambda x:int(x.replace('-','1')))
     def convert_price(x):
         if '-' in x:
-            return 42157500
+            return 42157500  # 결측치 평균연봉 하위 25%로 대체
 
-        단위 = re.findall('[가-힣]', x)
+         # '만,억,조'를 숫자로 변환
+        단위 = re.findall('[가-힣]', x) 
         끝단위 = 단위[-1]
         if 끝단위 == '만':
             price = re.findall('\d+', x.replace(',', '').replace('만', '만0000'))
@@ -469,8 +463,10 @@ def all_preprocess(integrated_data):
             price = re.findall('\d+', x.replace(',', '').replace('조', '조000000000000'))
 
         return int(''.join([i.zfill(4) for i in price]))
+   
+
     def 경력_cat(x):
-        if pd.isnull(x) or x == 'nan':
+        if pd.isnull(x) or x == 'nan':  # 결측치 신입으로 대체
             return '신입'
         
         # 정규표현식을 사용하여 문자열에서 숫자 추출
@@ -488,13 +484,14 @@ def all_preprocess(integrated_data):
                 return '신입'
             else:
                 return '시니어'
+    
     integrated_data['평균연봉'] = integrated_data['평균연봉'].apply(lambda x:convert_price(x))
     integrated_data['매출액'] = integrated_data['매출액'].apply(lambda x:convert_price(x))
     integrated_data['직급'].fillna('경력 무관')
     integrated_data['직급'] = integrated_data['직급'].apply(lambda x: 경력_cat(x))
 
 
-        # 주소 결측치 행 '미기재'로 대체
+    # 주소 결측치 행 '미기재'로 대체
     integrated_data.loc[integrated_data['주소'] !=integrated_data['주소'], '주소'] = '미기재'
 
     # '구' 미포함 행 '미기재'로 대체
@@ -557,7 +554,7 @@ def all_preprocess(integrated_data):
     우대사항_list = [i for i in 우대사항_list if i not in stp_list]
 
     for i in range(len(df['자격요건_한글명사'])):
-        #print(df['자격요건_한글명사'][i])
+       
         df['자격요건_한글명사'][i].extend(df['자격요건_영어명사'][i])
         df['우대사항_한글명사'][i].extend(df['우대사항_영어명사'][i])
 
@@ -566,12 +563,11 @@ def all_preprocess(integrated_data):
     integrated_data['우대사항_키워드'] = df['우대사항_한글명사']
 
     for i in range(len(integrated_data['자격요건_키워드'])):
-        #print(df['자격요건_한글명사'][i])
         
         integrated_data['자격요건_키워드'][i] = [j for j in integrated_data['자격요건_키워드'][i] if j not in stp_list]
-                
-        
         integrated_data['우대사항_키워드'][i] = [j for j in integrated_data['우대사항_키워드'][i] if j not in stp_list]
+    
+    # 사원수 100명 단위로 범주화
     def change(data):
         if data <= 100:
             data = '100명이하'
