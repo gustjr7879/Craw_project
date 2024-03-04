@@ -1,5 +1,4 @@
 from selenium import webdriver
-import requests
 import pandas as pd
 import re
 from selenium.webdriver.common.by import By
@@ -137,7 +136,7 @@ class CModels():
                 if i == 2:
                     must = re.sub('•','',driver.find_element(By.XPATH,f'//*[@id="__next"]/main/div[1]/div/section/section/article[1]/div/div[{i}]').text).split('\n')[1:]
                     #자격요건
-                    elif i == 3:
+                elif i == 3:
                     prefer = re.sub('•','',driver.find_element(By.XPATH,f'//*[@id="__next"]/main/div[1]/div/section/section/article[1]/div/div[{i}]').text).split('\n')[1:]
                     #우대사항
             must_list.append(must)
