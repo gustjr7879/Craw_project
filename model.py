@@ -88,8 +88,12 @@ def index_search(data,search_name,company_vector):
             return_name.append(data['기업명'][i])
             idx.append(i)
             cnt += 1
+    idx_list = []
     for i in idx:
+        idx_list.append(data.drop('features',axis=1).iloc[i])
         print('기업정보는 다음과 같아요 \n',data.drop('features',axis=1).iloc[i])
+    sim_df = pd.DataFrame(idx_list)
+    sim_df.to_excel('유사기업.xlsx')
     return return_name
 
 
@@ -128,9 +132,12 @@ def make_mean(inp, vec,model,data,vec_size):
                 return_name.append(data['기업명'][i])
                 idx.append(i)
                 cnt += 1
-
+    idx_list = []
     for i in idx:
+        idx_list.append(data.drop('features',axis=1).iloc[i])
         print('기업정보는 다음과 같아요 \n',data.drop('features',axis=1).iloc[i])
+    sim_df = pd.DataFrame(idx_list)
+    sim_df.to_excel('교육프로그램스킬_유사기업.xlsx')
     return return_name
 
 def skill_search(search_name,model):
