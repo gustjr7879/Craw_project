@@ -42,6 +42,8 @@ def draw_plotly_company_names(vectors_list, tsne,data):
     cluster.fit(vectors_list) #유사한 벡터들끼리 색깔 유사하게
     y_kmeans = cluster.predict(vectors_list)
     fig = px.scatter(x = feat[:,0],y = feat[:,1],color=y_kmeans,text=data['기업명'],width=1200, height=1200) #tsne 그려줌
+    fig.update_traces(marker={'size': 8},textposition='top center')
+
     fig.update_layout(
         font=dict(
             family="Courier New, monospace",
@@ -57,6 +59,7 @@ def draw_plotly_skill_names(model, tsne):
     cluster.fit(model.wv.vectors)
     y_kmeans = cluster.predict(model.wv.vectors)
     fig = px.scatter(x_embed3[:,0],x_embed3[:,1],color=y_kmeans,text=model.wv.index_to_key,width=800, height=800) #그려줌
+    fig.update_traces(marker={'size': 8},textposition='top center')
     return fig
 
 def index_search(data,search_name,company_vector):
