@@ -80,12 +80,16 @@ def index_search(data,search_name,company_vector):
     nei_name = list(set(nei_name)) #유사한 기업 추가
     return_name = []
     cnt = 0
+    idx = []
     for i in nei_name:
         if cnt == 5: #5개 검색
             break
         elif data['기업명'][i] != search_name: #동일한 기업일 시 pass
             return_name.append(data['기업명'][i])
+            idx.append(i)
             cnt += 1
+    for i in idx:
+        print('기업정보는 다음과 같아요 \n',data.drop('features',axis=1).iloc[i])
     return return_name
 
 
@@ -112,6 +116,7 @@ def make_mean(inp, vec,model,data,vec_size):
 
     return_name = []
     cnt = 0
+    idx = []
     for i in sim_vec:
         if i >= 170: #170개 기준으로 했기 때문에 사용, index error 회피
             pass
@@ -121,7 +126,11 @@ def make_mean(inp, vec,model,data,vec_size):
 
             elif data['기업명'][i] not in return_name: #중복되지 않게 구함
                 return_name.append(data['기업명'][i])
+                idx.append(i)
                 cnt += 1
+
+    for i in idx:
+        print('기업정보는 다음과 같아요 \n',data.drop('features',axis=1).iloc[i])
     return return_name
 
 def skill_search(search_name,model):
@@ -142,7 +151,6 @@ def skill_search(search_name,model):
             nei_name.append(j)
     nei_name = list(set(nei_name))
     return_name = []
-
     cnt = 0
     for i in nei_name:
         if cnt == 5: #5개 까지 구함
