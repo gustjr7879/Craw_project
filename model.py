@@ -41,11 +41,11 @@ def draw_plotly_company_names(vectors_list, tsne,data):
     cluster = KMeans(n_clusters=5) #k-means clustering으로 색깔 표시
     cluster.fit(vectors_list) #유사한 벡터들끼리 색깔 유사하게
     y_kmeans = cluster.predict(vectors_list)
-    fig = px.scatter(x = feat[:,0],y = feat[:,1],color=y_kmeans,text=data['기업명'],width=900, height=900) #tsne 그려줌
+    fig = px.scatter(x = feat[:,0],y = feat[:,1],color=y_kmeans,text=data['기업명'],width=1200, height=1200) #tsne 그려줌
     fig.update_layout(
         font=dict(
             family="Courier New, monospace",
-            size=11,  # Set the font size here
+            size=13,  # Set the font size here
             color="RebeccaPurple"
         ) #기업 이름 크기 설정
     )
